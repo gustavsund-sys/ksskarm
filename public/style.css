@@ -74,7 +74,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   flex-shrink: 0;
 }
 .countdown-block > div:first-child { flex: 1; min-width: 0; }
-.countdown-block.countdown-only { justify-content: center; }
+.countdown-block.countdown-only { justify-content: flex-end; }
 .countdown-block span { font-size: 1.8cqw; font-weight: 700; letter-spacing: .1em; }
 .countdown-block small { display: block; font-size: 2cqw; margin-top: 1cqw; overflow-wrap: anywhere; }
 .countdown { display: flex; gap: 3cqw; flex-shrink: 0; }
