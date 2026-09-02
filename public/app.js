@@ -37,8 +37,6 @@ function renderScreen() {
   $('clock').textContent = time(now);
   const stale = data.syncedAt && now - +new Date(data.syncedAt) > 20 * 60 * 1000;
   $('health').textContent = networkError || data.error || stale ? (data.syncedAt ? `Senast hämtat ${fmt(data.syncedAt, {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}` : 'Schemat är inte tillgängligt') : '';
-  if (!clock.synced) $('health').textContent = 'Tiden är inte synkroniserad · använder enhetens klocka';
-  $('clock').title = clock.synced ? 'Tid synkroniserad med webbservern' : 'Tid från enheten';
   $('health').title = data.error || '';
   $('start-block').hidden = !current;
   $('countdown-block').hidden = !next;
