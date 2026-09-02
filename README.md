@@ -82,4 +82,4 @@ Den lokala Python-servern använder SQLite och kräver inte Firebase. För att p
 - `firestore.rules`: behörighet och datavalidering.
 - `server.py`: lokal utvecklingsserver.
 
-Google Fonts används med systemtypsnitt som reserv. Ingen universitetslogotyp har kopierats; avsändaren anges som text.
+Utseendet är inspirerat av [oru.se](https://www.oru.se/): marinblått (#133455), vitt, röda accenter, Oswald-rubriker och Open Sans. Typsnitten laddas via Google Fonts med systemtypsnitt som reserv. Universitetets oförändrade logotyp är hämtad från https://www.oru.se/globalassets/bildbank/systembilder/logotype.png och används som avsändare för universitetets konsertskärm.

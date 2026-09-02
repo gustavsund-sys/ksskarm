@@ -94,7 +94,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self.reply(200, read_state(db, 'schedule', {}))
         files = {'/': ('index.html', 'text/html'), '/admin': ('index.html', 'text/html'),
                  '/app.js': ('app.js', 'text/javascript'), '/program.mjs': ('program.mjs', 'text/javascript'),
-                 '/style.css': ('style.css', 'text/css')}
+                 '/style.css': ('style.css', 'text/css'),
+                 '/assets/oru-logo.png': ('assets/oru-logo.png', 'image/png')}
         for name in ('firebase-config.mjs', 'firebase-store.mjs', 'stockholm.mjs'):
             files['/' + name] = (name, 'text/javascript')
         if path not in files:
