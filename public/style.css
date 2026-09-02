@@ -37,10 +37,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .masthead {
   display: flex; justify-content: space-between; align-items: center;
   padding: 4.2cqw 6cqw; gap: 4cqw; flex-shrink: 0;
+  background: var(--ink); color: var(--paper);
 }
-.brand { display: flex; align-items: center; }
-.brand img { display: block; width: 22cqw; height: auto; }
-.room { text-align: right; font-size: 1.85cqw; letter-spacing: .12em; color: var(--ink); }
+.brand { display: flex; align-items: center; background: var(--paper); padding: 2cqw; }
+.brand img { display: block; width: 18cqw; height: auto; }
+.room { text-align: right; font-size: 1.85cqw; letter-spacing: .12em; color: var(--paper); }
 .room span {
   display: block; font-family: 'Oswald', sans-serif; font-size: 5.3cqw;
   line-height: 1.15; letter-spacing: .01em; margin-top: 1.1cqw;
