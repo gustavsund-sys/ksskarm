@@ -34,10 +34,14 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   overflow: hidden;
   position: relative;
 }
+.poster {
+  display: flex; flex-direction: column; flex: 1; min-height: 0;
+  background: linear-gradient(to top, var(--ink), #3e5974);
+}
 .masthead {
   display: flex; justify-content: space-between; align-items: center;
   padding: 4.2cqw 6cqw; gap: 4cqw; flex-shrink: 0;
-  background: var(--ink); color: var(--paper);
+  color: var(--paper);
 }
 .brand { position: relative; flex-shrink: 0; }
 .brand img { display: block; width: 36cqw; height: auto; }
@@ -47,7 +51,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   line-height: 1.15; letter-spacing: .01em; margin-top: 1.1cqw;
 }
 .feature {
-  background: var(--ink); color: var(--paper); flex: 1; display: flex;
+  color: var(--paper); flex: 1; display: flex;
   flex-direction: column; padding: 5cqw 6cqw 4cqw; min-height: 0;
 }
 .eyebrow { display: flex; align-items: center; gap: 1.4cqw; font-size: 1.9cqw; letter-spacing: .12em; font-weight: 600; }
