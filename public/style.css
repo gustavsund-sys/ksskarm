@@ -47,7 +47,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .brand img { display: block; width: 36cqw; height: auto; }
 .room { text-align: right; font-size: 1.85cqw; letter-spacing: .12em; color: var(--paper); }
 .room span {
-  display: block; font-family: 'Oswald', sans-serif; font-size: 6.4cqw;
+  display: block; font-family: 'Oswald', sans-serif; font-size: 6.4cqw; font-weight: 500;
   line-height: 1.15; letter-spacing: .01em; margin-top: 0;
 }
 .feature {
