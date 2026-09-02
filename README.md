@@ -82,4 +82,4 @@ Den lokala Python-servern använder SQLite och kräver inte Firebase. För att p
 - `firestore.rules`: behörighet och datavalidering.
 - `server.py`: lokal utvecklingsserver.
 
-Utseendet är inspirerat av [oru.se](https://www.oru.se/): marinblått (#133455), vitt, röda accenter, Oswald-rubriker och Open Sans. Typsnitten laddas via Google Fonts med systemtypsnitt som reserv. Universitetets liggande logotyp har tillhandahållits av beställaren och används med transparent bakgrund som avsändare för universitetets konsertskärm. CSS gör textdelen vit mot den marinblå bakgrunden och behåller sköldens originalfärger.
+Utseendet är inspirerat av [oru.se](https://www.oru.se/): marinblått (#133455), vitt, röda accenter, Oswald-rubriker och Open Sans. Typsnitten laddas via Google Fonts med systemtypsnitt som reserv. Universitetets liggande logotyp har tillhandahållits av beställaren och används med transparent bakgrund som avsändare för universitetets konsertskärm. Bilden visas i sina originalfärger.
