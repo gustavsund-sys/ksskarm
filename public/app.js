@@ -60,7 +60,6 @@ function renderScreen() {
   const eventName = (current?.eventType || 'Konsert').toLocaleUpperCase('sv');
   $('status').textContent = live.length ? `${eventName} PÅGÅR` : current ? `NÄSTA ${eventName}` : 'PROGRAM';
   $('start-label').textContent = current?.eventType && !current.eventType.toLocaleLowerCase('sv').includes('konsert') ? 'STARTTID' : 'KONSERTSTART';
-  $('status-dot').classList.toggle('live', !!live.length);
   $('kind').textContent = current ? kind(current).toUpperCase() : '';
   $('kind').hidden = !current;
   $('concert-date').textContent = current ? fullDate(current.start) : '';
