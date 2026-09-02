@@ -67,7 +67,6 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .start-block { display: grid; grid-template-columns: 1fr auto; align-items: end; margin-top: auto; padding-top: 3cqw; }
 .start-block > span:first-child { grid-column: 1 / -1; font-size: 1.7cqw; letter-spacing: .16em; color: #d8e5f0; }
 .start-block strong { font-family: 'Oswald', sans-serif; font-weight: 400; font-size: 15cqw; letter-spacing: -.02em; line-height: 1.2; }
-.venue { text-align: right; font-size: 2.1cqw; line-height: 1.6; padding-bottom: 1.5cqw; color: #d8e5f0; }
 .countdown-block {
   background: linear-gradient(90deg, var(--ink) 0%, var(--accent) 100%);
   color: var(--paper); padding: 3.5cqw 6cqw;
