@@ -1,0 +1,49 @@
+name: Uppdatera schema och publicera skärmen
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '2-57/5 * * * *'
+permissions:
+  contents: read
+concurrency:
+  group: concert-pages
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Kontrollera filtrering, tider och lagring
+        run: |
+          python -m unittest discover -s tests -v
+          node --test tests/*.test.mjs
+      - name: Hämta aktuellt schema
+        run: python scripts/export_schedule.py
+      - name: Förbered statisk webbplats
+        run: touch public/.nojekyll
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publicera
+        id: deployment
+        uses: actions/deploy-pages@v4

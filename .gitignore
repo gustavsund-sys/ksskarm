@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+data/*.sqlite3*
+data/*.html
+.env
+.DS_Store
+firepit-log.txt
+firebase-debug.log
+firestore-debug.log
+.firebase/
+node_modules/
+public/schedule.json
+data/admin-access.txt
