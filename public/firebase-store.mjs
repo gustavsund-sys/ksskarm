@@ -10,10 +10,11 @@ const db = getFirestore(app);
 let source = { events: [], excluded: [], syncedAt: null };
 let edits = {};
 let manual = [];
+let imageProgram = null;
 let canEdit = false;
 let emit = () => {};
 const errors = new Map();
-const snapshot = () => ({ ...source, events: [...source.events, ...manual].sort((a,b) => new Date(a.start) - new Date(b.start)), edits, error: [...errors.values()].join(' ') || null });
+const snapshot = () => ({ ...source, imageProgram, events: [...source.events, ...manual].sort((a,b) => new Date(a.start) - new Date(b.start)), edits, error: [...errors.values()].join(' ') || null });
 const publish = () => emit(snapshot());
 const friendly = error => ({
   'permission-denied': 'Databasen saknar läsbehörighet. Kontrollera Firestore-reglerna.',
@@ -31,6 +32,7 @@ export function subscribe(onData, onAccess) {
     accept(docs.docs); errors.delete(name); publish();
   }, error => { errors.set(name, friendly(error)); publish(); });
   const stops = [
+    onSnapshot(doc(db, "screenImages", "program"), value => { imageProgram = value.exists() ? value.data() : null; errors.delete("imageProgram"); publish(); }, error => { errors.set("imageProgram", friendly(error)); publish(); }),
     listen('concertEdits', docs => { edits = Object.fromEntries(docs.map(d => [d.id, d.data()])); }),
     listen('manualConcerts', docs => { manual = docs.map(d => { const v = d.data(); return { ...v, id: d.id, start: v.start.toDate().toISOString(), end: v.end.toDate().toISOString(), date: new Intl.DateTimeFormat('sv-SE', {timeZone:'Europe/Stockholm', year:'numeric',month:'2-digit',day:'2-digit'}).format(v.start.toDate()), manual: true, kind:'extra' }; }); }),
     onAuthStateChanged(auth, async user => {
@@ -93,4 +95,13 @@ export async function saveConcert(payload, isManual) {
   if (!isManual) edits[id] = saved.data();
   publish();
   return snapshot();
+}
+
+export async function saveImageProgram(record) {
+  if (!canEdit || !auth.currentUser) throw new Error('Du behöver vara inloggad som administratör.');
+  const ref = doc(db, 'screenImages', 'program');
+  if (!record) await deleteDoc(ref);
+  else await setDoc(ref, { ...record, updatedAt: serverTimestamp(), updatedBy: auth.currentUser.uid });
+  imageProgram = record;
+  publish();
 }

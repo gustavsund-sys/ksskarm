@@ -40,6 +40,23 @@ service cloud.firestore {
         && request.resource.data.end - request.resource.data.start <= duration.value(24, 'h');
       allow delete: if isAdmin();
     }
+    match /screenImages/program {
+      allow read: if true;
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly(['title', 'image', 'start', 'end', 'updatedAt', 'updatedBy'])
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0 && request.resource.data.title.size() <= 120
+        && request.resource.data.image is string && request.resource.data.image.size() <= 850000
+        && (request.resource.data.image.matches('data:image/jpeg;base64,[A-Za-z0-9+/=]+')
+          || (request.resource.data.image.size() <= 4000 && request.resource.data.image.matches('https://[^ ]+')))
+        && request.resource.data.start is string && request.resource.data.end is string
+        && request.resource.data.start.matches('[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}Z')
+        && request.resource.data.end.matches('[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3}Z')
+        && request.resource.data.end > request.resource.data.start
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.updatedBy == request.auth.uid;
+      allow delete: if isAdmin();
+    }
     match /{document=**} { allow read, write: if false; }
   }
 }

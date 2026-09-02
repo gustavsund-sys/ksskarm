@@ -20,6 +20,7 @@
       <div id="start-block" class="start-block" hidden><span id="start-label">KONSERTSTART</span><strong id="start-time"></strong></div>
       <p id="description" class="description">Hämtar konsertprogrammet…</p>
     </section>
+      <div id="scheduled-image" hidden><img id="scheduled-image-content" alt=""></div>
     </div>
     <section id="countdown-block" class="countdown-block" aria-label="Tid till nästa konsert" hidden><div id="countdown-context" hidden><span id="countdown-label"></span><small id="countdown-title"></small></div><div id="countdown" class="countdown"></div></section>
     <section id="upcoming" class="upcoming" hidden><div class="section-label">Kommande evenemang</div><div id="upcoming-list"></div></section>
@@ -30,6 +31,7 @@
     <header class="admin-header"><div><p class="eyebrow">KONSERTSALEN / ADMINISTRATION</p><h1>Konsertprogram</h1><p>Justera presentationen. Dina ändringar sparas separat från schemat.</p></div><a href="./">Visa skärmen ↗</a></header>
     <p id="local-notice" class="local-notice">Lokal förhandsvisning · Ändringar sparas i en SQLite-databas på den här datorn. Den publicerade skärmen använder Firebase.</p>
     <section id="login-panel" class="login-panel" hidden><h2>Logga in för att redigera</h2><form id="login-form"><label>Lösenord<input id="password" type="password" autocomplete="current-password" required></label><button id="login-button" class="primary" type="submit">Logga in</button></form><p id="login-message" role="status"></p></section><button id="logout" hidden>Logga ut</button><div class="admin-summary"><div><strong id="event-count">—</strong><span>konserter i schemat</span></div><div><strong>19:00</strong><span>kväll · 16–21 och 18–21</span></div><div><strong>12:30</strong><span>lunch · 12–14</span></div></div>
+    <section id="image-admin" class="login-panel" hidden><h2>Schemalagd bild</h2><p>Bilden visas under loggan under vald period och ersätter då konsertprogrammet. Hela bilden visas utan beskärning. Tider anges i svensk tid.</p><p id="image-summary"></p><button id="open-image" type="button">Lägg till eller ändra bild</button></section>
     <div class="admin-tools"><label>Sök konsert<input id="search" type="search" placeholder="Sök i momenttexten…"></label><button class="primary" id="add-concert">+ Lägg till konsert</button><span id="sync-info"></span></div>
     <p id="admin-message" role="status"></p>
     <div id="admin-list"></div>
@@ -37,6 +39,17 @@
     <p class="admin-footnote">Affischen visas från konsertstart tills bokningens sluttid passerats. För extra konserter används din angivna sluttid. Om en bokning flyttas till en annan dag eller ett annat tidsintervall behandlas den som en ny post.</p>
   </main>
   <dialog id="editor"><form id="edit-form"><div class="dialog-heading"><p id="editor-label" class="eyebrow">REDIGERA KONSERT</p><button type="button" id="close-editor" aria-label="Stäng">×</button></div><h2 id="edit-date"></h2><p id="source-title" class="source-title"></p><label id="manual-date-label" hidden>Datum<input id="manual-date" type="date"></label><label>Evenemangstyp<input id="edit-type" list="event-types" maxlength="40" required placeholder="Till exempel Konferens"><datalist id="event-types"><option value="Konsert"><option value="Konferens"><option value="Föreläsning"><option value="Lunchkonsert"><option value="Kvällskonsert"></datalist></label><label>Rubrik / momenttext<textarea id="edit-title" required maxlength="240" rows="3"></textarea></label><label>Extra information<textarea id="edit-description" maxlength="600" rows="3" placeholder="Till exempel medverkande eller repertoar"></textarea></label><div class="time-fields"><label>Konsertstart<input id="edit-start" type="time" required disabled></label><label>Sluttid<input id="edit-end" type="time" required disabled></label></div><label class="checkbox"><input id="edit-hidden" type="checkbox"> Dölj konserten på skärmen</label><p id="edit-message" role="alert"></p><div class="dialog-actions"><button id="reset-edit" type="button">Återställ från schema</button><button id="delete-manual" type="button" hidden>Ta bort konsert</button><button class="primary" type="submit">Spara ändringar</button></div></form></dialog>
+  <dialog id="image-editor"><form id="image-form"><div class="dialog-heading"><h2>Schemalagd bild</h2><button type="button" id="close-image" aria-label="Stäng">×</button></div>
+    <label>Namn<input id="image-name" maxlength="120" required placeholder="Till exempel Konferensprogram"></label>
+    <label>Bild (JPG, PNG eller WebP, högst 20 MB)<input id="image-file" type="file" accept="image/jpeg,image/png,image/webp"></label>
+    <label>Alternativt: extern bildlänk (HTTPS)<input id="image-url" type="url" placeholder="https://exempel.se/program.jpg"></label>
+    <p>En extern länk måste gå direkt till en offentlig bild. Lämna länken tom för att använda den uppladdade bilden.</p>
+    <p>Bilden anpassas automatiskt för skärmen. En ny bild ersätter den tidigare schemalagda bilden.</p>
+    <img id="image-preview" alt="Förhandsvisning av programbild" hidden>
+    <label>Visa från (svensk tid)<input id="image-start" type="datetime-local" required></label>
+    <label>Visa till (svensk tid)<input id="image-end" type="datetime-local" required></label>
+    <p id="image-message" role="alert"></p><div class="dialog-actions"><button id="remove-image" type="button">Ta bort bild</button><button class="primary" type="submit">Spara bild och tider</button></div>
+  </form></dialog>
   <script type="module" src="./app.js"></script>
 </body>
 </html>

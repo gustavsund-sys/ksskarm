@@ -1,4 +1,5 @@
 import { selectProgram } from './program.mjs';
+import { activeImage, setupImageEditor } from './image-program.mjs';
 import { createClock } from './clock.mjs';
 const clock = createClock();
 const initialClockSync = clock.sync();
@@ -18,6 +19,11 @@ let selectedId = null;
 let editingManual = false;
 let loading = true;
 let networkError = false;
+let failedImage = null;
+$('scheduled-image-content').addEventListener('error', () => {
+  failedImage = { url: $('scheduled-image-content').getAttribute('src'), retryAt: clock.now() + 60000 };
+  renderScreen();
+});
 const fmt = (date, options) => new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', ...options }).format(new Date(date));
 const time = date => fmt(date, { hour: '2-digit', minute: '2-digit' });
 const fullDate = date => fmt(date, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
@@ -32,6 +38,17 @@ function countdown(start) {
 }
 function renderScreen() {
   const now = clock.now();
+  let programImage = activeImage(data.imageProgram, now);
+  if (failedImage && programImage?.image === failedImage.url) {
+    if (now < failedImage.retryAt) programImage = null;
+    else { failedImage = null; $('scheduled-image-content').removeAttribute('src'); }
+  }
+  $('screen').classList.toggle('image-mode', !!programImage);
+  $('scheduled-image').hidden = !programImage;
+  if (programImage) {
+    if ($('scheduled-image-content').getAttribute('src') !== programImage.image) $('scheduled-image-content').src = programImage.image;
+    $('scheduled-image-content').alt = programImage.title;
+  }
   const { current, next, live, upcoming } = selectProgram(data.events.map(effective), now);
   $('today').textContent = fmt(now, { day: 'numeric', month: 'long', year: 'numeric' });
   $('clock').textContent = time(now);
@@ -69,6 +86,8 @@ function renderScreen() {
   }));
 }
 function renderAdmin() {
+  $('image-admin').hidden = !canEdit;
+  $('image-summary').textContent = data.imageProgram ? `${data.imageProgram.title} · ${fullDate(data.imageProgram.start)} ${time(data.imageProgram.start)} – ${fullDate(data.imageProgram.end)} ${time(data.imageProgram.end)}` : 'Ingen bild schemalagd.';
   const query = $('search').value.toLocaleLowerCase('sv');
   $('event-count').textContent = data.events.length;
   $('sync-info').textContent = data.syncedAt ? `Senast hämtat ${fullDate(data.syncedAt)} ${time(data.syncedAt)}` : 'Ingen lyckad hämtning ännu';
@@ -146,6 +165,17 @@ async function save(reset = false, remove = false) {
   } catch (error) { $('edit-message').textContent = error.message; }
   finally { buttons.forEach(b => b.disabled = false); }
 }
+setupImageEditor({ current: () => data.imageProgram, now: () => clock.now(), save: async record => {
+  if (!canEdit) throw new Error('Logga in för att spara.');
+  if (!local) await cloud.saveImageProgram(record);
+  else {
+    const response = await fetch('/api/image', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ record }) });
+    const body = await response.json();
+    if (!response.ok) throw new Error(body.error || 'Bilden kunde inte sparas.');
+    data = body;
+  }
+  renderAdmin();
+} });
 $('edit-form').addEventListener('submit', e => { e.preventDefault(); save(); });
 $('reset-edit').addEventListener('click', () => save(true));
 $('add-concert').addEventListener('click', () => openEditor());

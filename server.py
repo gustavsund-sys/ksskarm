@@ -62,6 +62,7 @@ def sync(html=None):
 def snapshot():
     with connect() as db:
         result = read_state(db, 'schedule', {'events': [], 'excluded': [], 'syncedAt': None, 'source': SOURCE_URL})
+        result['imageProgram'] = read_state(db, 'imageProgram')
         result['error'] = read_state(db, 'error')
         result['edits'] = {row[0]: json.loads(row[1]) for row in db.execute('SELECT id,value FROM edits')}
         result['events'].extend(json.loads(row[0]) for row in db.execute('SELECT value FROM manual'))
@@ -96,7 +97,7 @@ class Handler(BaseHTTPRequestHandler):
                  '/app.js': ('app.js', 'text/javascript'), '/program.mjs': ('program.mjs', 'text/javascript'),
                  '/style.css': ('style.css', 'text/css'),
                  '/assets/oru-logo.png': ('assets/oru-logo.png', 'image/png')}
-        for name in ('firebase-config.mjs', 'firebase-store.mjs', 'stockholm.mjs', 'clock.mjs'):
+        for name in ('firebase-config.mjs', 'firebase-store.mjs', 'stockholm.mjs', 'clock.mjs', 'image-program.mjs'):
             files['/' + name] = (name, 'text/javascript')
         if path not in files:
             return self.reply(404, {'error': 'Sidan finns inte.'})
@@ -109,11 +110,26 @@ class Handler(BaseHTTPRequestHandler):
             return self.reply(403, {'error': 'Redigering tillåts bara från den lokala appen.'})
         try:
             length = int(self.headers.get('Content-Length', 0))
-            if not 0 < length <= 16000:
+            if not 0 < length <= (900000 if urlparse(self.path).path == '/api/image' else 16000):
                 raise ValueError('Ogiltig storlek.')
             payload = json.loads(self.rfile.read(length))
             if not isinstance(payload, dict):
                 raise ValueError('Ogiltiga uppgifter.')
+            if urlparse(self.path).path == '/api/image':
+                record = payload.get('record')
+                if record is not None:
+                    if not isinstance(record, dict) or set(record) != {'title', 'image', 'start', 'end'}:
+                        raise ValueError('Ogiltig bildpost.')
+                    if not isinstance(record['title'], str) or not 0 < len(record['title']) <= 120:
+                        raise ValueError('Ange ett namn på högst 120 tecken.')
+                    if not isinstance(record['image'], str) or not (record['image'].startswith('data:image/jpeg;base64,') or (record['image'].startswith('https://') and len(record['image']) <= 4000)) or len(record['image']) > 850000:
+                        raise ValueError('Ogiltig bild.')
+                    start, end = (datetime.fromisoformat(record[k].replace('Z', '+00:00')) for k in ('start', 'end'))
+                    if start.tzinfo is None or end.tzinfo is None or end <= start:
+                        raise ValueError('Kontrollera bildens visningstider.')
+                with connect() as db:
+                    put_state(db, 'imageProgram', record)
+                return self.reply(200, snapshot())
             event_type = payload.get('eventType', '')
             if not isinstance(event_type, str) or len(event_type) > 40:
                 raise ValueError('Evenemangstypen får vara högst 40 tecken.')
