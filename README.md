@@ -83,3 +83,5 @@ Den lokala Python-servern använder SQLite och kräver inte Firebase. För att p
 - `server.py`: lokal utvecklingsserver.
 
 Utseendet är inspirerat av [oru.se](https://www.oru.se/): marinblått (#133455), vitt, röda accenter, Oswald-rubriker och Open Sans. Typsnitten laddas via Google Fonts med systemtypsnitt som reserv. Universitetets liggande logotyp har tillhandahållits av beställaren och används med transparent bakgrund som avsändare för universitetets konsertskärm. Bilden visas i sina originalfärger.
+
+Skärmens tid synkroniseras mot webbserverns HTTP Date-header vid start, varje minut och när sidan åter blir synlig eller nätet återkommer. Färska svar används och tiden räknas vidare med performance.now(), oberoende av ändringar i datorns systemklocka. Vid tillfälliga nätfel fortsätter senast synkroniserade tid. Före första lyckade synkningen används enhetens tid med synlig status. HTTP-tiden har sekundupplösning och är ingen exakt atomklocka. Lokal förhandsvisning använder den lokala serverns klocka.

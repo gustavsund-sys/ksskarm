@@ -1,4 +1,7 @@
 import { selectProgram } from './program.mjs';
+import { createClock } from './clock.mjs';
+const clock = createClock();
+const initialClockSync = clock.sync();
 const $ = id => document.getElementById(id);
 const admin = location.pathname === '/admin' || new URLSearchParams(location.search).has('admin');
 const local = ['localhost', '127.0.0.1'].includes(location.hostname) && !new URLSearchParams(location.search).has('firebase');
@@ -22,18 +25,20 @@ const kind = e => e.eventType || (e.kind === 'extra' ? 'Extra konsert' : e.kind 
 const effective = e => ({ ...e, ...data.edits[e.id] });
 function node(tag, text, cls) { const el = document.createElement(tag); el.textContent = text; if (cls) el.className = cls; return el; }
 function countdown(start) {
-  const seconds = Math.max(0, Math.ceil((new Date(start) - Date.now()) / 1000));
+  const seconds = Math.max(0, Math.ceil((new Date(start) - clock.now()) / 1000));
   const days = Math.floor(seconds / 86400);
   const units = days ? [[days, 'dagar'], [Math.floor(seconds % 86400 / 3600), 'tim'], [Math.floor(seconds % 3600 / 60), 'min']] : [[Math.floor(seconds / 3600), 'tim'], [Math.floor(seconds % 3600 / 60), 'min'], [seconds % 60, 'sek']];
   $('countdown').replaceChildren(...units.map(([value, label]) => { const el = node('div', ''); el.append(node('b', String(value).padStart(2, '0')), node('em', label)); return el; }));
 }
 function renderScreen() {
-  const now = Date.now();
+  const now = clock.now();
   const { current, next, live, upcoming } = selectProgram(data.events.map(effective), now);
   $('today').textContent = fmt(now, { day: 'numeric', month: 'long', year: 'numeric' });
   $('clock').textContent = time(now);
   const stale = data.syncedAt && now - +new Date(data.syncedAt) > 20 * 60 * 1000;
   $('health').textContent = networkError || data.error || stale ? (data.syncedAt ? `Senast hämtat ${fmt(data.syncedAt, {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}` : 'Schemat är inte tillgängligt') : '';
+  if (!clock.synced) $('health').textContent = 'Tiden är inte synkroniserad · använder enhetens klocka';
+  $('clock').title = clock.synced ? 'Tid synkroniserad med webbservern' : 'Tid från enheten';
   $('health').title = data.error || '';
   $('start-block').hidden = !current;
   $('countdown-block').hidden = !next;
@@ -105,13 +110,13 @@ function openEditor(original = null) {
   if (!canEdit) return;
   selectedId = original?.id || null;
   editingManual = !original || !!original.manual;
-  const e = original ? effective(original) : { title: '', start: new Date(), end: new Date() };
+  const e = original ? effective(original) : { title: '', start: new Date(clock.now()), end: new Date(clock.now()) };
   $('editor-label').textContent = original ? 'REDIGERA KONSERT' : 'LÄGG TILL KONSERT';
   $('edit-date').textContent = original ? fullDate(e.start) : 'En extra konsert';
   $('source-title').textContent = editingManual ? 'Välj tider fritt. Konserten sparas som en egen post.' : `Original i schemat: ${original.title}`;
   $('manual-date-label').hidden = !editingManual;
   $('manual-date').required = editingManual;
-  $('manual-date').value = original?.date || fmt(new Date(), { year:'numeric', month:'2-digit', day:'2-digit' });
+  $('manual-date').value = original?.date || fmt(new Date(clock.now()), { year:'numeric', month:'2-digit', day:'2-digit' });
   $('edit-start').disabled = !editingManual;
   $('edit-end').disabled = !editingManual;
   $('edit-type').value = original ? kind(e) : 'Konsert';
@@ -178,7 +183,13 @@ $('login-form').addEventListener('submit', async event => {
   finally { button.disabled = false; }
 });
 $('logout').addEventListener('click', async () => { await cloud.logout(); $('editor').close(); });
+await initialClockSync;
 await refresh();
+async function syncClock() { await clock.sync(); if (!admin) renderScreen(); }
+setInterval(syncClock, 60000);
+window.addEventListener('online', syncClock);
+window.addEventListener('pageshow', syncClock);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) syncClock(); });
 setInterval(() => { if (!admin) renderScreen(); }, 1000);
 // Serialize polling so slow responses never overwrite a newer response.
 async function poll() { await refresh(); setTimeout(poll, 15000); }

@@ -96,7 +96,7 @@ class Handler(BaseHTTPRequestHandler):
                  '/app.js': ('app.js', 'text/javascript'), '/program.mjs': ('program.mjs', 'text/javascript'),
                  '/style.css': ('style.css', 'text/css'),
                  '/assets/oru-logo.png': ('assets/oru-logo.png', 'image/png')}
-        for name in ('firebase-config.mjs', 'firebase-store.mjs', 'stockholm.mjs'):
+        for name in ('firebase-config.mjs', 'firebase-store.mjs', 'stockholm.mjs', 'clock.mjs'):
             files['/' + name] = (name, 'text/javascript')
         if path not in files:
             return self.reply(404, {'error': 'Sidan finns inte.'})
