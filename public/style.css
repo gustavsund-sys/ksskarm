@@ -165,4 +165,4 @@ dialog textarea { resize: vertical; line-height: 1.5; }
   .admin-card h2 { font-size: 20px; }
 }
 
-#status { min-width: 0; overflow-wrap: anywhere; }
+#status { min-width: 0; overflow-wrap: anywhere; font-size: 3cqw; }
