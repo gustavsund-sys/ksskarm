@@ -1,3 +1,4 @@
+import { startVersionCheck } from './version-check.mjs';
 import { selectProgram } from './program.mjs';
 import { activeImage, overlappingImages, setupImageEditor } from './image-program.mjs';
 import { createClock } from './clock.mjs';
@@ -232,3 +233,5 @@ setInterval(() => { if (!admin) renderScreen(); }, 1000);
 // Serialize polling so slow responses never overwrite a newer response.
 async function poll() { await refresh(); setTimeout(poll, 15000); }
 setTimeout(poll, 15000);
+
+if (!admin && !local) startVersionCheck();

@@ -1,3 +1,4 @@
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -10,12 +11,14 @@ class BuildTests(unittest.TestCase):
             root = Path(temp)
             source = root / 'public'
             source.mkdir()
-            (source / 'index.html').write_text('<script src="./app.js"></script>')
+            (source / 'index.html').write_text('<html><head></head><body><script src="./app.js"></script></body></html>')
             (source / 'app.js').write_text("import('./store.mjs'); fetch('./schedule.json');")
             (source / 'store.mjs').write_text('export const type = "Konsert";')
             (source / 'schedule.json').write_text('{}')
             first = build(source, root / 'first')
             self.assertIn(f'./app.{first}.js', (root / 'first/index.html').read_text())
+            self.assertEqual(first, json.loads((root / 'first/version.json').read_text())['version'])
+            self.assertIn(f'name="app-version" content="{first}"', (root / 'first/index.html').read_text())
             script = (root / f'first/app.{first}.js').read_text()
             self.assertIn(f'./store.{first}.mjs', script)
             self.assertIn('./schedule.json', script)

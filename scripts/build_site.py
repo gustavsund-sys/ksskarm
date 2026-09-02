@@ -1,5 +1,6 @@
 """Publish content-versioned assets so a release cannot mix old/new modules."""
 import hashlib
+import json
 import re
 import shutil
 from pathlib import Path
@@ -22,11 +23,14 @@ def build(source, target):
         destination.parent.mkdir(parents=True, exist_ok=True)
         if path in code:
             text = path.read_text(encoding='utf-8')
+            if path.name == 'index.html':
+                text = text.replace('<head>', f'<head>\n  <meta name="app-version" content="{version}">', 1)
             for old, new in names.items():
                 text = text.replace('./' + old, './' + new)
             destination.write_text(text, encoding='utf-8')
         else:
             shutil.copyfile(path, destination)
+    (target / 'version.json').write_text(json.dumps({'version': version}), encoding='utf-8')
     (target / '.nojekyll').touch()
     return version
 
