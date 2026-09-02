@@ -18,7 +18,7 @@ let networkError = false;
 const fmt = (date, options) => new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', ...options }).format(new Date(date));
 const time = date => fmt(date, { hour: '2-digit', minute: '2-digit' });
 const fullDate = date => fmt(date, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-const kind = e => e.kind === 'extra' ? 'Extra konsert' : e.kind === 'lunch' ? 'Lunchkonsert' : 'Kvällskonsert';
+const kind = e => e.eventType || (e.kind === 'extra' ? 'Extra konsert' : e.kind === 'lunch' ? 'Lunchkonsert' : 'Kvällskonsert');
 const effective = e => ({ ...e, ...data.edits[e.id] });
 function node(tag, text, cls) { const el = document.createElement(tag); el.textContent = text; if (cls) el.className = cls; return el; }
 function countdown(start) {
@@ -37,7 +37,9 @@ function renderScreen() {
   $('health').title = data.error || '';
   $('start-block').hidden = !current;
   $('countdown-block').hidden = !next;
-  $('status').textContent = live.length ? 'KONSERT PÅGÅR' : current ? 'NÄSTA KONSERT' : 'KONSERTPROGRAM';
+  const eventName = (current?.eventType || 'Konsert').toLocaleUpperCase('sv');
+  $('status').textContent = live.length ? `${eventName} PÅGÅR` : current ? `NÄSTA ${eventName}` : 'PROGRAM';
+  $('start-label').textContent = current?.eventType && !current.eventType.toLocaleLowerCase('sv').includes('konsert') ? 'STARTTID' : 'KONSERTSTART';
   $('status-dot').classList.toggle('live', !!live.length);
   $('kind').textContent = current ? kind(current).toUpperCase() : '';
   $('kind').hidden = !current;
@@ -50,7 +52,7 @@ function renderScreen() {
   if (next) {
     $('countdown-context').hidden = !live.length;
     $('countdown-block').classList.toggle('countdown-only', !live.length);
-    $('countdown-label').textContent = live.length ? 'NÄSTA KONSERT OM' : '';
+    $('countdown-label').textContent = live.length ? `NÄSTA ${(next.eventType || 'Konsert').toLocaleUpperCase('sv')} OM` : '';
     $('countdown-title').textContent = live.length ? next.title : '';
     countdown(next.start);
   }
@@ -112,6 +114,7 @@ function openEditor(original = null) {
   $('manual-date').value = original?.date || fmt(new Date(), { year:'numeric', month:'2-digit', day:'2-digit' });
   $('edit-start').disabled = !editingManual;
   $('edit-end').disabled = !editingManual;
+  $('edit-type').value = original ? kind(e) : 'Konsert';
   $('edit-title').value = e.title;
   $('edit-description').value = e.description || '';
   $('edit-start').value = original ? time(e.start) : '19:00';
@@ -127,7 +130,7 @@ async function save(reset = false, remove = false) {
   const buttons = [...$('edit-form').querySelectorAll('button')];
   buttons.forEach(b => b.disabled = true);
   try {
-    const payload = reset ? { id: selectedId, reset: true } : { id: selectedId, title: $('edit-title').value, description: $('edit-description').value, hidden: $('edit-hidden').checked };
+    const payload = reset ? { id: selectedId, reset: true } : { id: selectedId, title: $('edit-title').value, eventType: $('edit-type').value.trim(), description: $('edit-description').value, hidden: $('edit-hidden').checked };
     if (editingManual) Object.assign(payload, { date: $('manual-date').value, startTime: $('edit-start').value, endTime: $('edit-end').value, delete: remove });
     if (!local) {
       data = await cloud.saveConcert(payload, editingManual); renderAdmin(); $('editor').close();

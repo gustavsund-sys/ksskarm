@@ -114,6 +114,10 @@ class Handler(BaseHTTPRequestHandler):
             payload = json.loads(self.rfile.read(length))
             if not isinstance(payload, dict):
                 raise ValueError('Ogiltiga uppgifter.')
+            event_type = payload.get('eventType', '')
+            if not isinstance(event_type, str) or len(event_type) > 40:
+                raise ValueError('Evenemangstypen får vara högst 40 tecken.')
+            event_type = event_type.strip()
             path = urlparse(self.path).path
             if path not in ('/api/edit', '/api/manual'):
                 return self.reply(404, {'error': 'Sidan finns inte.'})
@@ -146,7 +150,7 @@ class Handler(BaseHTTPRequestHandler):
                 event_id = event_id or 'manual:' + str(uuid.uuid4())
                 event = {'id': event_id, 'manual': True, 'date': start.date().isoformat(),
                     'start': start.isoformat(), 'end': end.isoformat(), 'kind': 'extra',
-                    'title': title.strip(), 'description': description.strip(), 'hidden': payload['hidden'],
+                    'title': title.strip(), 'eventType': event_type, 'description': description.strip(), 'hidden': payload['hidden'],
                     'updatedAt': datetime.now(timezone.utc).isoformat()}
                 with connect() as db:
                     db.execute('INSERT OR REPLACE INTO manual VALUES (?,?)', (event_id, json.dumps(event)))
@@ -165,7 +169,7 @@ class Handler(BaseHTTPRequestHandler):
                         raise ValueError('Beskrivningen får vara högst 600 tecken.')
                     if type(payload.get('hidden')) is not bool:
                         raise ValueError('Ogiltig synlighet.')
-                    edit = {'title': title.strip(), 'description': description.strip(),
+                    edit = {'title': title.strip(), 'eventType': event_type, 'description': description.strip(),
                             'hidden': payload['hidden'], 'updatedAt': datetime.now(timezone.utc).isoformat(),
                             'sourceTitle': event['title']}
                     db.execute('INSERT OR REPLACE INTO edits VALUES (?,?)', (event['id'], json.dumps(edit)))

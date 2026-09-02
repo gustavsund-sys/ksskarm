@@ -9,6 +9,7 @@ service cloud.firestore {
     function validCommon(d) {
       return d.title is string && d.title.size() > 0 && d.title.size() <= 240
         && d.description is string && d.description.size() <= 600
+        && (!('eventType' in d) || (d.eventType is string && d.eventType.size() > 0 && d.eventType.size() <= 40))
         && d.hidden is bool
         && d.updatedAt == request.time
         && d.updatedBy == request.auth.uid;
@@ -21,7 +22,7 @@ service cloud.firestore {
       allow read: if true;
       allow create, update: if isAdmin()
         && id.matches('konsertsal:.*')
-        && request.resource.data.keys().hasOnly(['title', 'description', 'hidden', 'sourceTitle', 'updatedAt', 'updatedBy'])
+        && request.resource.data.keys().hasOnly(['title', 'eventType', 'description', 'hidden', 'sourceTitle', 'updatedAt', 'updatedBy'])
         && validCommon(request.resource.data)
         && request.resource.data.sourceTitle is string
         && request.resource.data.sourceTitle.size() <= 10000;
@@ -31,7 +32,7 @@ service cloud.firestore {
       allow read: if true;
       allow create, update: if isAdmin()
         && id.matches('manual:.*')
-        && request.resource.data.keys().hasOnly(['title', 'description', 'hidden', 'start', 'end', 'updatedAt', 'updatedBy'])
+        && request.resource.data.keys().hasOnly(['title', 'eventType', 'description', 'hidden', 'start', 'end', 'updatedAt', 'updatedBy'])
         && validCommon(request.resource.data)
         && request.resource.data.start is timestamp
         && request.resource.data.end is timestamp

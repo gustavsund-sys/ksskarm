@@ -72,7 +72,9 @@ export async function saveConcert(payload, isManual) {
   if (payload.reset || payload.delete) { await deleteDoc(ref); return snapshot(); }
   const title = payload.title.trim();
   if (!title || title.length > 240 || payload.description.length > 600) throw new Error('Kontrollera rubrik och beskrivning.');
-  const record = { title, description: payload.description.trim(), hidden: payload.hidden, updatedAt: serverTimestamp(), updatedBy: auth.currentUser.uid };
+  const eventType = payload.eventType?.trim() || '';
+  if (!eventType || eventType.length > 40) throw new Error('Evenemangstypen behöver vara 1–40 tecken.');
+  const record = { title, eventType, description: payload.description.trim(), hidden: payload.hidden, updatedAt: serverTimestamp(), updatedBy: auth.currentUser.uid };
   if (isManual) {
     const start = new Date(stockholmISO(payload.date, payload.startTime));
     const end = new Date(stockholmISO(payload.date, payload.endTime));

@@ -68,20 +68,22 @@ class StorageTests(unittest.TestCase):
         return result
 
     def test_edit_survives_sync_and_reset(self):
-        status, _ = self.post('/api/edit', {'id': self.event['id'], 'title': 'Egen titel', 'hidden': False})
+        status, _ = self.post('/api/edit', {'id': self.event['id'], 'title': 'Egen titel', 'eventType': 'Föreläsning', 'hidden': False})
         self.assertEqual(status, 200)
         server.sync(table([('1 Okt', '12:00-14:00', 'Ändrad i källan')]))
         state = server.snapshot()
         self.assertEqual(state['events'][0]['title'], 'Ändrad i källan')
         self.assertEqual(state['edits'][self.event['id']]['title'], 'Egen titel')
+        self.assertEqual(state['edits'][self.event['id']]['eventType'], 'Föreläsning')
         self.post('/api/edit', {'id': self.event['id'], 'reset': True})
         self.assertEqual(server.snapshot()['edits'], {})
 
     def test_extra_concert_create_update_hide_and_delete(self):
-        values = {'title': 'Söndagskonsert', 'date': '2026-10-04', 'startTime': '15:45', 'endTime': '17:00', 'description': 'Eget program', 'hidden': False}
+        values = {'title': 'Söndagskonsert', 'eventType': 'Konferens', 'date': '2026-10-04', 'startTime': '15:45', 'endTime': '17:00', 'description': 'Eget program', 'hidden': False}
         status, data = self.post('/api/manual', values)
         self.assertEqual(status, 200)
         manual = next(e for e in data['events'] if e.get('manual'))
+        self.assertEqual(manual['eventType'], 'Konferens')
         self.assertEqual(manual['start'], '2026-10-04T15:45:00+02:00')
         server.sync(table([]))
         self.assertEqual(len(server.snapshot()['events']), 1)
