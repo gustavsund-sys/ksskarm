@@ -62,7 +62,8 @@ def sync(html=None):
 def snapshot():
     with connect() as db:
         result = read_state(db, 'schedule', {'events': [], 'excluded': [], 'syncedAt': None, 'source': SOURCE_URL})
-        result['imageProgram'] = read_state(db, 'imageProgram')
+        legacy_image = read_state(db, 'imageProgram')
+        result['imagePrograms'] = read_state(db, 'imagePrograms', [dict(legacy_image, id='program')] if legacy_image else [])
         result['error'] = read_state(db, 'error')
         result['edits'] = {row[0]: json.loads(row[1]) for row in db.execute('SELECT id,value FROM edits')}
         result['events'].extend(json.loads(row[0]) for row in db.execute('SELECT value FROM manual'))
@@ -128,7 +129,13 @@ class Handler(BaseHTTPRequestHandler):
                     if start.tzinfo is None or end.tzinfo is None or end <= start:
                         raise ValueError('Kontrollera bildens visningstider.')
                 with connect() as db:
-                    put_state(db, 'imageProgram', record)
+                    legacy_image = read_state(db, 'imageProgram')
+                    images = read_state(db, 'imagePrograms', [dict(legacy_image, id='program')] if legacy_image else [])
+                    image_id = payload.get('id') or str(uuid.uuid4())
+                    images = [image for image in images if image['id'] != image_id]
+                    if record:
+                        images.append(dict(record, id=image_id))
+                    put_state(db, 'imagePrograms', images)
                 return self.reply(200, snapshot())
             event_type = payload.get('eventType', '')
             if not isinstance(event_type, str) or len(event_type) > 40:

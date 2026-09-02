@@ -1,5 +1,5 @@
 import { selectProgram } from './program.mjs';
-import { activeImage, setupImageEditor } from './image-program.mjs';
+import { activeImage, overlappingImages, setupImageEditor } from './image-program.mjs';
 import { createClock } from './clock.mjs';
 const clock = createClock();
 const initialClockSync = clock.sync();
@@ -38,7 +38,7 @@ function countdown(start) {
 }
 function renderScreen() {
   const now = clock.now();
-  let programImage = activeImage(data.imageProgram, now);
+  let programImage = activeImage(data.imagePrograms, now);
   if (failedImage && programImage?.image === failedImage.url) {
     if (now < failedImage.retryAt) programImage = null;
     else { failedImage = null; $('scheduled-image-content').removeAttribute('src'); }
@@ -87,7 +87,19 @@ function renderScreen() {
 }
 function renderAdmin() {
   $('image-admin').hidden = !canEdit;
-  $('image-summary').textContent = data.imageProgram ? `${data.imageProgram.title} · ${fullDate(data.imageProgram.start)} ${time(data.imageProgram.start)} – ${fullDate(data.imageProgram.end)} ${time(data.imageProgram.end)}` : 'Ingen bild schemalagd.';
+  const images = [...(data.imagePrograms || [])].sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
+  $('image-summary').textContent = images.length ? `${images.length} schemalagda bilder` : 'Ingen bild schemalagd.';
+  $('image-list').replaceChildren(...images.map(record => {
+    const card = node('article', '', 'admin-card');
+    const body = node('div', '');
+    body.append(node('h3', record.title), node('p', `${fullDate(record.start)} ${time(record.start)} – ${fullDate(record.end)} ${time(record.end)}`));
+    const state = Date.parse(record.end) <= clock.now() ? 'Avslutad' : Date.parse(record.start) <= clock.now() ? 'Aktuell period' : 'Kommande';
+    body.append(node('span', state, 'badge'));
+    if (overlappingImages(record, images).length) body.append(node('p', 'Överlappande tider: bilden med senaste starttid prioriteras.'));
+    const button = node('button', 'Redigera bild'); button.disabled = !canEdit;
+    button.onclick = () => imageEditor.open(record);
+    card.append(body, button); return card;
+  }));
   const query = $('search').value.toLocaleLowerCase('sv');
   $('event-count').textContent = data.events.length;
   $('sync-info').textContent = data.syncedAt ? `Senast hämtat ${fullDate(data.syncedAt)} ${time(data.syncedAt)}` : 'Ingen lyckad hämtning ännu';
@@ -165,11 +177,11 @@ async function save(reset = false, remove = false) {
   } catch (error) { $('edit-message').textContent = error.message; }
   finally { buttons.forEach(b => b.disabled = false); }
 }
-setupImageEditor({ current: () => data.imageProgram, now: () => clock.now(), save: async record => {
+const imageEditor = setupImageEditor({ now: () => clock.now(), save: async (record, id) => {
   if (!canEdit) throw new Error('Logga in för att spara.');
-  if (!local) await cloud.saveImageProgram(record);
+  if (!local) await cloud.saveImageProgram(record, id);
   else {
-    const response = await fetch('/api/image', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ record }) });
+    const response = await fetch('/api/image', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ record, id }) });
     const body = await response.json();
     if (!response.ok) throw new Error(body.error || 'Bilden kunde inte sparas.');
     data = body;

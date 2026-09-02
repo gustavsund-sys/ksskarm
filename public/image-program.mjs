@@ -1,7 +1,12 @@
 import { stockholmISO } from './stockholm.mjs';
 
-export function activeImage(record, now) {
-  return record && Date.parse(record.start) <= now && now < Date.parse(record.end) ? record : null;
+export function activeImage(records, now) {
+  const list = Array.isArray(records) ? records : records ? [records] : [];
+  return list.filter(record => Date.parse(record.start) <= now && now < Date.parse(record.end))
+    .sort((a, b) => Date.parse(b.start) - Date.parse(a.start) || String(a.id || '').localeCompare(String(b.id || '')))[0] || null;
+}
+export function overlappingImages(record, records) {
+  return records.filter(other => other.id !== record.id && Date.parse(record.start) < Date.parse(other.end) && Date.parse(other.start) < Date.parse(record.end));
 }
 
 export async function prepareImage(file) {
@@ -25,13 +30,14 @@ export async function prepareImage(file) {
   } finally { bitmap.close(); }
 }
 
-export function setupImageEditor({ save, current, now }) {
+export function setupImageEditor({ save, now }) {
   const $ = id => document.getElementById(id);
   let image = null;
+  let selectedId = null;
   let busy = false;
   const dateTime = value => new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Stockholm', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date(value)).replace(' ', 'T');
-  $('open-image').onclick = () => {
-    const record = current();
+  const open = (record = null) => {
+    selectedId = record?.id || null;
     image = record?.image?.startsWith('data:') ? record.image : null;
     $('image-url').value = record?.image?.startsWith('https://') ? record.image : '';
     $('image-name').value = record?.title || '';
@@ -44,6 +50,7 @@ export function setupImageEditor({ save, current, now }) {
     $('remove-image').hidden = !record;
     $('image-editor').showModal();
   };
+  $('open-image').onclick = () => open();
   const lock = value => {
     busy = value;
     for (const el of $('image-form').querySelectorAll('button, input')) el.disabled = value;
@@ -93,11 +100,12 @@ export function setupImageEditor({ save, current, now }) {
         record = { title: $('image-name').value.trim(), image: chosen, start, end };
         if (!record.title) throw new Error('Ange ett namn för bilden.');
       }
-      await save(record);
+      await save(record, selectedId);
       $('image-editor').close();
     } catch (error) { $('image-message').textContent = error.message; }
     finally { lock(false); }
   }
   $('image-form').onsubmit = e => { e.preventDefault(); submit(false); };
   $('remove-image').onclick = () => { if (confirm('Ta bort den schemalagda bilden?')) submit(true); };
+  return { open };
 }

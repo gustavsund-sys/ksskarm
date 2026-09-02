@@ -31,7 +31,7 @@
     <header class="admin-header"><div><p class="eyebrow">KONSERTSALEN / ADMINISTRATION</p><h1>Konsertprogram</h1><p>Justera presentationen. Dina ändringar sparas separat från schemat.</p></div><a href="./">Visa skärmen ↗</a></header>
     <p id="local-notice" class="local-notice">Lokal förhandsvisning · Ändringar sparas i en SQLite-databas på den här datorn. Den publicerade skärmen använder Firebase.</p>
     <section id="login-panel" class="login-panel" hidden><h2>Logga in för att redigera</h2><form id="login-form"><label>Lösenord<input id="password" type="password" autocomplete="current-password" required></label><button id="login-button" class="primary" type="submit">Logga in</button></form><p id="login-message" role="status"></p></section><button id="logout" hidden>Logga ut</button><div class="admin-summary"><div><strong id="event-count">—</strong><span>konserter i schemat</span></div><div><strong>19:00</strong><span>kväll · 16–21 och 18–21</span></div><div><strong>12:30</strong><span>lunch · 12–14</span></div></div>
-    <section id="image-admin" class="login-panel" hidden><h2>Schemalagd bild</h2><p>Bilden visas under loggan under vald period och ersätter då konsertprogrammet. Hela bilden visas utan beskärning. Tider anges i svensk tid.</p><p id="image-summary"></p><button id="open-image" type="button">Lägg till eller ändra bild</button></section>
+    <section id="image-admin" class="login-panel" hidden><h2>Schemalagda bilder</h2><p>Bilden visas under loggan under vald period och ersätter då konsertprogrammet. Hela bilden visas utan beskärning. Tider anges i svensk tid.</p><p id="image-summary"></p><button id="open-image" type="button">+ Lägg till bild</button><div id="image-list"></div></section>
     <div class="admin-tools"><label>Sök konsert<input id="search" type="search" placeholder="Sök i momenttexten…"></label><button class="primary" id="add-concert">+ Lägg till konsert</button><span id="sync-info"></span></div>
     <p id="admin-message" role="status"></p>
     <div id="admin-list"></div>
@@ -44,7 +44,7 @@
     <label>Bild (JPG, PNG eller WebP, högst 20 MB)<input id="image-file" type="file" accept="image/jpeg,image/png,image/webp"></label>
     <label>Alternativt: extern bildlänk (HTTPS)<input id="image-url" type="url" placeholder="https://exempel.se/program.jpg"></label>
     <p>En extern länk måste gå direkt till en offentlig bild. Lämna länken tom för att använda den uppladdade bilden.</p>
-    <p>Bilden anpassas automatiskt för skärmen. En ny bild ersätter den tidigare schemalagda bilden.</p>
+    <p>Bilden anpassas automatiskt för skärmen. Varje bild sparas med egna visningstider. Vid överlapp visas bilden med senaste starttid.</p>
     <img id="image-preview" alt="Förhandsvisning av programbild" hidden>
     <label>Visa från (svensk tid)<input id="image-start" type="datetime-local" required></label>
     <label>Visa till (svensk tid)<input id="image-end" type="datetime-local" required></label>

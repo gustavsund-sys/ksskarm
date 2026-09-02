@@ -40,7 +40,7 @@ service cloud.firestore {
         && request.resource.data.end - request.resource.data.start <= duration.value(24, 'h');
       allow delete: if isAdmin();
     }
-    match /screenImages/program {
+    match /screenImages/{imageId} {
       allow read: if true;
       allow create, update: if isAdmin()
         && request.resource.data.keys().hasOnly(['title', 'image', 'start', 'end', 'updatedAt', 'updatedBy'])
