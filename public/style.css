@@ -56,7 +56,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 }
 .eyebrow { display: flex; align-items: center; gap: 1.4cqw; font-size: 1.9cqw; letter-spacing: .12em; font-weight: 600; }
 .concert-kind { align-self: flex-start; max-width: 100%; overflow-wrap: anywhere; margin: 5cqw 0 2cqw; font-size: 2.2cqw; font-weight: 600; letter-spacing: .12em; }
-.concert-date { display: flex; justify-content: space-between; width: 0; min-width: 100%; font-family: 'Oswald', sans-serif; font-size: 3.5cqw; font-weight: 400; color: #d8e5f0; margin: 0 0 1cqw; letter-spacing: .02em; }
+.concert-date { display: flex; justify-content: space-between; width: 0; min-width: 100%; font-family: 'Oswald', sans-serif; font-size: 2.8cqw; font-weight: 400; color: #d8e5f0; margin: 0 0 1cqw; letter-spacing: .02em; }
 .feature h1 {
   font-family: 'Oswald', sans-serif; font-size: 10cqw; font-weight: 500;
   line-height: 1.15; letter-spacing: -.015em; overflow-wrap: anywhere;
