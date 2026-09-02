@@ -58,7 +58,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .dot { display: inline-block; width: 1.3cqw; height: 1.3cqw; border-radius: 100%; background: #fff; }
 .dot.live { background: #fff; box-shadow: 0 0 0 .65cqw #ffffff25; }
 .concert-kind { align-self: flex-start; max-width: 100%; overflow-wrap: anywhere; margin: 5cqw 0 2cqw; font-size: 2.2cqw; font-weight: 600; letter-spacing: .12em; }
-.concert-date { font-size: 2.8cqw; color: #d8e5f0; margin: 0 0 2cqw; text-align: right; }
+.concert-date { font-size: 2.8cqw; color: #d8e5f0; margin: auto 0 2cqw; padding-top: 3cqw; text-align: right; }
 .feature h1 {
   font-family: 'Oswald', sans-serif; font-size: 10cqw; font-weight: 500;
   line-height: 1.15; letter-spacing: -.015em; overflow-wrap: anywhere;
@@ -68,7 +68,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .feature h1.long { font-size: 6cqw; }
 .description { font-size: 2.6cqw; line-height: 1.5; color: #e3ebf2; margin: 0 0 2cqw; white-space: pre-line; overflow-wrap: anywhere; }
 .description.long { font-size: 2cqw; }
-.start-block { display: grid; justify-items: end; text-align: right; margin: 0 0 3cqw; }
+.start-block { display: grid; justify-items: end; text-align: right; margin: 0; }
 .start-block > span:first-child { grid-column: 1 / -1; font-size: 1.7cqw; letter-spacing: .16em; color: #d8e5f0; }
 .start-block strong { font-family: 'Oswald', sans-serif; font-weight: 400; font-size: 15cqw; letter-spacing: -.02em; line-height: 1.2; }
 .countdown-block {
