@@ -58,7 +58,7 @@ function renderScreen() {
   $('start-block').hidden = !current;
   $('countdown-block').hidden = !next;
   const eventName = (current?.eventType || 'Konsert').toLocaleUpperCase('sv');
-  $('status').textContent = live.length ? `${eventName} PÅGÅR` : current ? `NÄSTA ${eventName}` : 'PROGRAM';
+  $('status').textContent = live.length ? `${eventName} PÅGÅR` : current ? 'Nästa konsert:' : 'PROGRAM';
   $('start-label').textContent = current?.eventType && !current.eventType.toLocaleLowerCase('sv').includes('konsert') ? 'STARTTID' : 'KONSERTSTART';
   $('kind').textContent = current ? kind(current).toUpperCase() : '';
   $('kind').hidden = !current;
