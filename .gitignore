@@ -11,3 +11,4 @@ firestore-debug.log
 node_modules/
 public/schedule.json
 data/admin-access.txt
+dist/

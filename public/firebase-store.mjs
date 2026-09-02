@@ -1,6 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js';
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js';
-import { getFirestore, collection, doc, onSnapshot, getDoc, setDoc, deleteDoc, serverTimestamp, Timestamp } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js';
+import { getFirestore, collection, doc, onSnapshot, getDoc, getDocFromServer, setDoc, deleteDoc, serverTimestamp, Timestamp } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js';
 import { firebaseConfig } from './firebase-config.mjs';
 import { stockholmISO } from './stockholm.mjs';
 
@@ -86,5 +86,11 @@ export async function saveConcert(payload, isManual) {
     record.sourceTitle = original.title;
   }
   await setDoc(ref, record);
+  const saved = await getDocFromServer(ref);
+  if (!saved.exists() || saved.data().eventType !== eventType) {
+    throw new Error('Evenemangstypen kunde inte bekräftas i databasen. Ladda om sidan och försök igen.');
+  }
+  if (!isManual) edits[id] = saved.data();
+  publish();
   return snapshot();
 }

@@ -29,10 +29,10 @@ jobs:
       - name: Hämta aktuellt schema
         run: python scripts/export_schedule.py
       - name: Förbered statisk webbplats
-        run: touch public/.nojekyll
+        run: python scripts/build_site.py
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: public
+          path: dist
   deploy:
     needs: build
     runs-on: ubuntu-latest
