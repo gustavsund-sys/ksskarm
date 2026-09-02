@@ -48,7 +48,9 @@ function renderScreen() {
   $('description').classList.toggle('long', ($('description').textContent.length > 250));
   $('start-time').textContent = current ? time(current.start) : '';
   if (next) {
-    $('countdown-label').textContent = live.length ? 'NÄSTA KONSERT OM' : 'VI BÖRJAR OM';
+    $('countdown-context').hidden = !live.length;
+    $('countdown-block').classList.toggle('countdown-only', !live.length);
+    $('countdown-label').textContent = live.length ? 'NÄSTA KONSERT OM' : '';
     $('countdown-title').textContent = live.length ? next.title : '';
     countdown(next.start);
   }
