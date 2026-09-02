@@ -162,7 +162,7 @@ dialog textarea { resize: vertical; line-height: 1.5; }
   .admin-card h2 { font-size: 20px; }
 }
 
-#status { min-width: 0; overflow-wrap: anywhere; font-family: 'Oswald', sans-serif; font-size: 3.6cqw; font-weight: 500; letter-spacing: .04em; }
+#status { min-width: 0; overflow-wrap: anywhere; font-family: 'Oswald', sans-serif; font-size: 4.5cqw; font-weight: 500; letter-spacing: .04em; }
 
 .screen.image-mode .feature,
 .screen.image-mode > .countdown-block,
