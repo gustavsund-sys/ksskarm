@@ -61,7 +61,7 @@ function renderScreen() {
   $('status').textContent = live.length ? `${eventName} PÅGÅR` : current ? 'NÄSTA KONSERT:' : 'PROGRAM';
   $('kind').textContent = current ? kind(current).toUpperCase() : '';
   $('kind').hidden = !current;
-  $('concert-date').textContent = current ? fullDate(current.start) : '';
+  $('concert-date').replaceChildren(...(current ? ['day', 'month', 'year'].map(part => node('span', fmt(current.start, { [part]: part === 'month' ? 'short' : 'numeric' }).replace('.', '').toLocaleUpperCase('sv'))) : []));
   $('title').textContent = current?.title || 'Musik att se fram emot.';
   $('title').className = current?.title.length > 100 ? 'long' : current?.title.length > 55 ? 'medium' : '';
   $('description').textContent = current?.description || (current ? '' : loading ? 'Hämtar konsertprogrammet…' : !data.syncedAt ? 'Konsertprogrammet är tillfälligt otillgängligt.' : 'Inga kommande konserter är inbokade i de valda tidsintervallen.');
