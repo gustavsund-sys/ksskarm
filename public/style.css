@@ -39,8 +39,14 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   padding: 4.2cqw 6cqw; gap: 4cqw; flex-shrink: 0;
   background: var(--ink); color: var(--paper);
 }
-.brand { display: flex; align-items: center; background: var(--paper); padding: 2cqw; }
-.brand img { display: block; width: 18cqw; height: auto; }
+.brand { position: relative; flex-shrink: 0; }
+.brand img { display: block; width: 36cqw; height: auto; }
+/* Light lettering over navy; keep the original shield colours on the left. */
+.brand .brand-lettering {
+  position: absolute; inset: 0;
+  filter: brightness(0) invert(1);
+  clip-path: inset(0 0 0 30%);
+}
 .room { text-align: right; font-size: 1.85cqw; letter-spacing: .12em; color: var(--paper); }
 .room span {
   display: block; font-family: 'Oswald', sans-serif; font-size: 5.3cqw;
